@@ -3,9 +3,10 @@ var ground, invisibleGround, groundImage;
 var nuvem;
 var nuvemimg;
 var obs1, obs2, obs3, obs4, obs5, obs6;
-
-
-
+var cactosG, nuvensG;
+var PLAY = 1;
+var END = 0;
+var gameState = PLAY;
 
 
 
@@ -42,6 +43,10 @@ function setup() {
   //crie um solo invisível
   invisibleGround = createSprite(200,190,400,10);
   invisibleGround.visible = false;
+
+  //criar grupos (cactos e nuvens)
+  cactosG = new Group();
+  nuvensG = new Group();
  
   console.log("Olá " + "Samantha");
  
@@ -51,25 +56,37 @@ function draw() {
   //definir cor do plano de fundo
   background("white");
   
-  
-  
-  // pulando o trex ao pressionar a tecla de espaço
-  if(keyDown("space")&& trex.y >= 100) {
-    trex.velocityY = -10;
+  if(gameState === PLAY){
+
+      // pulando o trex ao pressionar a tecla de espaço
+      if(keyDown("space")&& trex.y >= 100) {
+        trex.velocityY = -10;
+      }
+
+      //Movendo o chão
+      if (ground.x < 0){
+        ground.x = ground.width/2;
+      }
+
+      gerarNuvens();
+      gerarCactos();
+
+     if(trex.collide(cactosG)){
+      gameState = END;
   }
-  
-  trex.velocityY = trex.velocityY + 0.8
-  
-  if (ground.x < 0){
-    ground.x = ground.width/2;
+
+  }else if(gameState === END){
+    ground.velocityX = 0;
+    cactosG.setVelocityXEach(0);
+    nuvensG.setVelocityXEach(0);
+
+
   }
-  
+
+  //Adicionando um efeito de gravidade
+  trex.velocityY = trex.velocityY + 0.8;
   //impedir que o trex caia
   trex.collide(invisibleGround);
-
-  gerarNuvens();
-  gerarCactos();
-
   drawSprites();
 }
 
@@ -86,6 +103,8 @@ function gerarNuvens(){
     nuvem.depth = 0;
 
     nuvem.lifetime = 210;
+    nuvensG.add(nuvem);
+
 }
 }
 function gerarCactos() {
@@ -110,5 +129,6 @@ function gerarCactos() {
     break;
   } 
   obstacle.lifetime = 300;
+  cactosG.add(obstacle);
 }
 }
